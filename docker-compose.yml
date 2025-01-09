@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  simple-trans:
+    image: ghcr.io/unterdrueckt/simple-trans:latest
+    container_name: simple-trans
+    restart: unless-stopped
+    ports:
+      - '3000:80'
+    environment:
+      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_PASSWORD=securepassword123
+    volumes:
+      - ./data:/pb_data

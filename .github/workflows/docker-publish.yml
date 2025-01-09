@@ -1,0 +1,45 @@
+name: Publish Docker Image to GHCR using SemVer
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - 'v*-*'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Extract SemVer from Git Tag
+        id: vars
+        run: |
+          # Extract version number from the tag (e.g., v1.0.0 -> 1.0.0)
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Check if version is stable
+        id: stable-check
+        run: |
+          if [[ "${{ env.VERSION }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "STABLE=true" >> $GITHUB_ENV
+          else
+            echo "STABLE=false" >> $GITHUB_ENV
+
+      - name: Build and push Docker image with SemVer tag
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+            ${{ env.STABLE == 'true' && format('ghcr.io/{0}:latest', github.repository) }}
