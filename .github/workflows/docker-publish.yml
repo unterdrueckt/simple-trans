@@ -35,6 +35,7 @@ jobs:
             echo "STABLE=true" >> $GITHUB_ENV
           else
             echo "STABLE=false" >> $GITHUB_ENV
+          fi
 
       - name: Build and push Docker image with SemVer tag
         uses: docker/build-push-action@v4
