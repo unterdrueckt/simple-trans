@@ -10,6 +10,10 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -43,4 +47,4 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:${{ env.VERSION }}
-            ${{ env.STABLE == 'true' && format('ghcr.io/{0}:latest', github.repository) }}
+            ${{ env.STABLE == 'true' && format('- ghcr.io/{0}:latest', github.repository) || '' }}
